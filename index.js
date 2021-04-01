@@ -24,10 +24,18 @@ const client = new MongoClient(uri, {
 client.connect((err) => {
     console.log("connection err", err);
     const eventCollection = client.db("ph-assignment10").collection("products");
+    const orders = client.db("ph-assignment10").collection("orders");
 
     app.get("/products", (req, res) => {
         console.log(eventCollection);
         eventCollection.find().toArray((err, items) => {
+            res.send(items);
+        });
+    });
+
+    app.get("/orders", (req, res) => {
+        // console.log(req.query.email);
+        orders.find({email: req.query.email}).toArray((err, items) => {
             res.send(items);
         });
     });
@@ -56,6 +64,15 @@ client.connect((err) => {
             .findOneAndDelete({ _id: id })
             .then((documents) => res.send(!!documents.value));
     });
+
+    app.post('/newOrder', (req, res) => {
+        const newOrder = req.body;
+        orders.insertOne(newOrder)
+        .then(result => {
+            res.send(result.insertedCount > 0 );
+        })
+        console.log(newOrder);
+    })
 
 });
 
