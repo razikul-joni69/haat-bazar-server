@@ -22,18 +22,14 @@ const client = new MongoClient(uri, {
 });
 client.connect((err) => {
     console.log("connection err", err);
-    const eventCollection = client.db("ph-assignment10").collection("products");
+    const productCollection = client
+        .db("ph-assignment10")
+        .collection("products");
     const orders = client.db("ph-assignment10").collection("orders");
 
     app.get("/products", (req, res) => {
-        eventCollection.find().toArray((err, items) => {
+        productCollection.find().toArray((err, items) => {
             res.send(items);
-        });
-    });
-
-    app.get("/manageProduct", (req, res) => {
-        eventCollection.filter(product => product._id !== _id).toArray((err, items) => {
-            console.log(items);
         });
     });
 
@@ -44,8 +40,7 @@ client.connect((err) => {
     });
 
     app.get("/product/:id", (req, res) => {
-        console.log("product-id", ObjectId(req.params.id));
-        eventCollection
+        productCollection
             .find({ _id: ObjectId(req.params.id) })
             .toArray((err, items) => {
                 res.send(items[0]);
@@ -54,15 +49,14 @@ client.connect((err) => {
 
     app.post("/addEvent", (req, res) => {
         const newEvent = req.body;
-        console.log("adding new event: ", newEvent);
-        eventCollection.insertOne(newEvent).then((result) => {
+        productCollection.insertOne(newEvent).then((result) => {
             res.send(result.insertedCount > 0);
         });
     });
 
     app.delete("/delete/:id", (req, res) => {
         const id = ObjectId(req.params.id);
-        eventCollection.findOneAndDelete({ _id: id }).then((documents) => {
+        productCollection.findOneAndDelete({ _id: id }).then((documents) => {
             res.send(!!documents.value);
         });
     });
@@ -72,7 +66,6 @@ client.connect((err) => {
         orders.insertOne(newOrder).then((result) => {
             res.send(result.insertedCount > 0);
         });
-        console.log(newOrder);
     });
 });
 
