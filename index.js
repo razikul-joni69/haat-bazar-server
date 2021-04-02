@@ -29,7 +29,7 @@ client.connect((err) => {
         console.log(eventCollection);
         eventCollection.find().toArray((err, items) => {
             res.send(items);
-            eventCollection.filter(product => product._id !==_id)
+            // eventCollection.filter(product => product._id !==_id)
         });
     });
 
@@ -60,7 +60,11 @@ client.connect((err) => {
         const id = ObjectId(req.params.id);
         eventCollection
             .findOneAndDelete({ _id: id })
-            .then((documents) => res.send(!!documents.value));
+            .then((documents) => {
+
+                res.send(!!documents.value)
+                res.redirect('/admin')
+            });
     });
 
     app.post("/newOrder", (req, res) => {
