@@ -26,10 +26,14 @@ client.connect((err) => {
     const orders = client.db("ph-assignment10").collection("orders");
 
     app.get("/products", (req, res) => {
-        console.log(eventCollection);
         eventCollection.find().toArray((err, items) => {
             res.send(items);
-            // eventCollection.filter(product => product._id !==_id)
+        });
+    });
+
+    app.get("/manageProduct", (req, res) => {
+        eventCollection.filter(product => product._id !== _id).toArray((err, items) => {
+            console.log(items);
         });
     });
 
@@ -58,13 +62,9 @@ client.connect((err) => {
 
     app.delete("/delete/:id", (req, res) => {
         const id = ObjectId(req.params.id);
-        eventCollection
-            .findOneAndDelete({ _id: id })
-            .then((documents) => {
-
-                res.send(!!documents.value)
-                res.redirect('/admin')
-            });
+        eventCollection.findOneAndDelete({ _id: id }).then((documents) => {
+            res.send(!!documents.value);
+        });
     });
 
     app.post("/newOrder", (req, res) => {
