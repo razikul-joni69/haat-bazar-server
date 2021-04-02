@@ -1,4 +1,3 @@
-
 const express = require("express");
 const app = express();
 const MongoClient = require("mongodb").MongoClient;
@@ -13,7 +12,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
-    res.send("Hello World!");
+    res.send("Database Connected Successfully");
 });
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.v0ilw.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
@@ -30,30 +29,29 @@ client.connect((err) => {
         console.log(eventCollection);
         eventCollection.find().toArray((err, items) => {
             res.send(items);
+            eventCollection.filter(product => product._id !==_id)
         });
     });
 
     app.get("/orders", (req, res) => {
-        // console.log(req.query.email);
-        orders.find({email: req.query.email}).toArray((err, items) => {
+        orders.find({ email: req.query.email }).toArray((err, items) => {
             res.send(items);
         });
     });
 
     app.get("/product/:id", (req, res) => {
-        console.log('product-id', ObjectId(req.params.id));
-        eventCollection.find({_id: ObjectId(req.params.id)})
-        .toArray((err, items) => {
-          console.log('error', err, 'res', items);
-            res.send(items[0]);
-        });
+        console.log("product-id", ObjectId(req.params.id));
+        eventCollection
+            .find({ _id: ObjectId(req.params.id) })
+            .toArray((err, items) => {
+                res.send(items[0]);
+            });
     });
 
     app.post("/addEvent", (req, res) => {
         const newEvent = req.body;
         console.log("adding new event: ", newEvent);
         eventCollection.insertOne(newEvent).then((result) => {
-            console.log("inserted count", result.insertedCount);
             res.send(result.insertedCount > 0);
         });
     });
@@ -65,17 +63,13 @@ client.connect((err) => {
             .then((documents) => res.send(!!documents.value));
     });
 
-    app.post('/newOrder', (req, res) => {
+    app.post("/newOrder", (req, res) => {
         const newOrder = req.body;
-        orders.insertOne(newOrder)
-        .then(result => {
-            res.send(result.insertedCount > 0 );
-        })
+        orders.insertOne(newOrder).then((result) => {
+            res.send(result.insertedCount > 0);
+        });
         console.log(newOrder);
-    })
-
+    });
 });
 
-app.listen(process.env.PORT || port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
-});
+app.listen(process.env.PORT || port);
